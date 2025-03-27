@@ -67,12 +67,12 @@ void bubblesort(int *data, int n){
 	for(i=0; i<=j; i++){
 	    if(data[i] > data[i+1]){
 	        /* exchange */
-		    temp = data[i];
-		    data[i] = data[i+1];
-		    data[i+1] = temp;
+		temp = data[i];
+		data[i] = data[i+1];
+		data[i+1] = temp;
 
-                    is_exchange = true;
-                    exchange++;
+                is_exchange = true;
+                exchange++;
 	    }
             compare++;
 	}
