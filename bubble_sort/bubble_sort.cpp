@@ -46,7 +46,7 @@ int main(){
     printf("\n");
 
     printf("compare times: %d\n", compare);
-    printf("leat compare times: %d\n", least_compare);
+    printf("least compare times: %d\n", least_compare);
     printf("exchange times: %d\n", exchange);
     printf("theoretical times (worst case): %d\n", n*(n-1)/2);
 
