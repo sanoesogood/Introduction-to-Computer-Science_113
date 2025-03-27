@@ -10,8 +10,7 @@
 void bubblesort(int *data, int n);
 void display(int *data, int n);
 
-int compare = 0;    // 比較次數 (for loop execute count)
-int least_compare = 0;    // 陣列排序完當下的比較次數
+int comparison = 0;    // 比較次數 (for loop execution count)
 int exchange = 0;
 
 int main(){
@@ -45,10 +44,9 @@ int main(){
     display(data, n);
     printf("\n");
 
-    printf("compare times: %d\n", compare);
-    printf("least compare times: %d\n", least_compare);
+    printf("comparison times: %d\n", comparison);
     printf("exchange times: %d\n", exchange);
-    printf("theoretical times (worst case): %d\n", n*(n-1)/2);
+    printf("theoretical comparison times (worst case): %d\n", n*(n-1)/2);
 
     delete [] data;
 
@@ -61,7 +59,7 @@ void bubblesort(int *data, int n){
     bool is_exchange = false;
 
     for(j=n-2; j>=0; j--){
-        is_exchange = 0;
+        is_exchange = false;
 
         /* scan */
         for(i=0; i<=j; i++){
@@ -74,10 +72,9 @@ void bubblesort(int *data, int n){
                 is_exchange = true;
                 exchange++;
             }
-            compare++;
+            comparison++;
         }
         if(!is_exchange){
-            least_compare = compare - (j + 1);    // 因為 for 迴圈中, 從 i=0 到 i<=j, 共執行 j+1 次
             break;
         }
     }
