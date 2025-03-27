@@ -63,20 +63,19 @@ void bubblesort(int *data, int n){
     for(j=n-2; j>=0; j--){
         is_exchange = 0;
 
-	/* scan */
-	for(i=0; i<=j; i++){
-	    if(data[i] > data[i+1]){
-	        /* exchange */
-		temp = data[i];
-		data[i] = data[i+1];
-		data[i+1] = temp;
+        /* scan */
+        for(i=0; i<=j; i++){
+            if(data[i] > data[i+1]){
+                /* exchange */
+                temp = data[i];
+                data[i] = data[i+1];
+                data[i+1] = temp;
 
                 is_exchange = true;
                 exchange++;
-	    }
+            }
             compare++;
-	}
-
+        }
         if(!is_exchange){
             least_compare = compare - (j + 1);    // 因為 for 迴圈中, 從 i=0 到 i<=j, 共執行 j+1 次
             break;
