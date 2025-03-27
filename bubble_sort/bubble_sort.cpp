@@ -74,6 +74,8 @@ void bubblesort(int *data, int n){
             }
             comparison++;
         }
+
+        /* bubble sort 優化，若無元素交換就跳出 (要多比一輪才能看出元素有無變動，所以多出 j+1 次比較 (j 為 跳出前的 j 值)) */
         if(!is_exchange){
             break;
         }
