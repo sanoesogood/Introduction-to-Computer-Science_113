@@ -1,162 +1,223 @@
-#define DEBUG 0
+/**
+ * backup: 
+ * https://github.com/sanoesogood/Introduction-to-Computer-Science_113/blob/main/1132_final_exam/main.cpp
+ */
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 
-void qsort(int *a, int from, int to);
-void msort(int *a, int from, int to);
-void bsort(int *a, int from, int to);
+#define DEBUG 0
+// 可切換排序方法 ('q': quick sort, 'm': merge sort, 'b': bubble sort)
+#define METHOD 'q'
 
-int  split(int *a, int from, int to);
-void merge(int *a, int f1, int t1, int f2, int t2);
-int sumArr(int *a, int from, int to);
+#define SORT_METHOD(arr, n, from, to, method) \
+    do{ \
+        if((method) == 'q') qsort(arr, from, to); \
+        else if((method) == 'm') msort(arr, n, from, to); \
+        else if((method) == 'b') bsort(arr, from, to); \
+    }while(0)
+
+#define printStd(std, label) \
+    printf("%f %f %f %f %f (%s)\n", \
+            std.excellent, \
+            std.aboveAverage, \
+            std.average, \
+            std.belowAverage, \
+            std.poor, \
+            (label) \
+    );
+
+// 五標
+typedef struct{
+    float excellent;
+    float aboveAverage;
+    float average;
+    float belowAverage;
+    float poor;
+} std_t;
 
 typedef struct{
     char name[8];
     int midterm;
-    int final;
-} student;
+    int finalexam;
+} student_t;
 
-student *gradeSheet;
-int n;
+void qsort(int *arr, int from, int to);
+void msort(int *arr, int n, int from, int to);
+void bsort(int *arr, int from, int to);
+
+int  split(int *arr, int from, int to);
+void merge(int *arr, int n, int f1, int t1, int f2, int t2);
+float sumArr(int *arr, int from, int to);
+std_t examStd(int *arr, int n);
 
 int main(){
-    student a;
-    int *gradeArr;
-    float range[5];
-    float midtermStd[5], finalStd[5];  // 頂前均後底
-    int p;  // 人數
+    const char inputPath [] = "abc.txt";
+    const char outputPath[] = "cba.txt";
+    student_t *gradeSheet = NULL;
+    student_t a;
+    int *gradeArr = NULL;  // 暫存成績
+    unsigned int n;  // student 總數
+    unsigned int p;  // 區間人數
+    std_t midtermStd, finalStd;
 
-    FILE *fp = fopen("abc.txt", "r");  // abc.txt 與主程式執行檔在同一個目錄下
-    FILE *output = fopen("cba.txt", "w");
-
-    fscanf(fp, "%d", &n);
-    gradeSheet = new student[n];
-    gradeArr = new int[n];
+    // 開啟檔案
+    FILE *finput = fopen(inputPath, "r");
+    if(finput == NULL){
+        perror(inputPath);
+        return 1;
+    }
+    FILE *foutput = fopen(outputPath, "w");
+    if(foutput == NULL){
+        perror(outputPath);
+        fclose(finput);
+        return 1;
+    }
 
     // 讀入 data 並用陣列儲存
-    if(fp == NULL)
-        perror("this file does not exist");
+    fscanf(finput, "%u", &n);
+    if(n < 4){
+        printf("n must be a positive integer and grater than or equal to 4.");
+        fclose(finput);
+        fclose(foutput);
+        return 1;
+    }
+
+    gradeSheet = new student_t[n];
+    gradeArr = new int[n];
 
     for(int i=0; i<n; i++){
-        fscanf(fp, "%s", &a.name);
-        fscanf(fp, "%d", &a.midterm);
-        fscanf(fp, "%d", &a.final);
+        fscanf(finput, "%7s %d %d",
+               a.name,
+               &a.midterm,
+               &a.finalexam);
         gradeSheet[i] = a;
     }
 
-    // 先將期中考分數由低到高排序，並計算五標)
+    // 先將期中考分數由低到高排序，並計算五標
     // (老師上課有說, 頂標最低分數: 前25%的平均, 前: 前50%, 均: 所有人, 後: 後50%, 底: 後25%)
     for(int i=0; i<n; i++){
         gradeArr[i] = gradeSheet[i].midterm;
     }
-    qsort(gradeArr, 0, n-1);
-    for(int i=0; i<3; i++){
-        if(i == 0){
-            p = n;
-            midtermStd[2] = (float)sumArr(gradeArr, 0, p-1) / p;
-        }
-        else{
-            p = n*(1./(2*i));
-            midtermStd[2-i] = (float)sumArr(gradeArr, 0, p-1) / p;
-            midtermStd[2+i] = (float)sumArr(gradeArr, n-p, n-1) / p;
-        }
-    }
+    SORT_METHOD(gradeArr, n, 0, n-1, METHOD);
+    midtermStd = examStd(gradeArr, n);
 
     // 再將期末考分數由低到高排序，並計算五標
     for(int i=0; i<n; i++){
-        gradeArr[i] = gradeSheet[i].final;
+        gradeArr[i] = gradeSheet[i].finalexam;
     }
-    qsort(gradeArr, 0, n-1);
-    for(int i=0; i<3; i++){
-        if(i == 0){
-            p = n;
-            finalStd[2] = (float)sumArr(gradeArr, 0, p-1) / p;
-        }
-        else{
-            p = n*(1./(2*i));
-            finalStd[2-i] = (float)sumArr(gradeArr, 0, p-1) / p;
-            finalStd[2+i] = (float)sumArr(gradeArr, n-p, n-1) / p;
-        }
-    }
+    SORT_METHOD(gradeArr, n, 0, n-1, METHOD);
+    finalStd = examStd(gradeArr, n);
 
     #if(DEBUG)
-    for(int i=0; i<5; i++){
-        printf("%f ", midtermStd[i]);
-    }
-    printf("\n");
-    for(int i=0; i<5; i++){
-        printf("%f ", finalStd[i]);
-    }
+    printStd(midtermStd, "midterm");
+    printStd(finalStd, "final exam");
     #endif
 
     // 找出期中考均標以上，期末考底標以上的學生，並寫入 cba.txt
     for(int i=0; i<n; i++){
-        if( gradeSheet[i].midterm >= midtermStd[2] &&\
-            gradeSheet[i].final   >= finalStd[0]
-        ){
-            fprintf(output, "%s ", gradeSheet[i].name);
-            fprintf(output, "%d ", gradeSheet[i].midterm);
-            fprintf(output, "%d\n", gradeSheet[i].final);
+        if( gradeSheet[i].midterm >= midtermStd.average &&
+            gradeSheet[i].finalexam >= finalStd.poor){
+            fprintf(foutput, "%s %d %d\n", 
+                    gradeSheet[i].name, 
+                    gradeSheet[i].midterm, 
+                    gradeSheet[i].finalexam
+            );
         }
     }
 
     // 記得關閉！
-    fclose(fp);
-    fclose(output);
-    delete [] gradeSheet;
-    delete [] gradeArr;
+    fclose(finput);
+    fclose(foutput);
+    delete[] gradeSheet;
+    delete[] gradeArr;
 
     return 0;
 }
 
-int sumArr(int *a, int from, int to){
-    int sum = 0;
+float sumArr(int *arr, int from, int to){
+    float sum = 0;
     for(int i=from; i<=to; i++){
-        sum += a[i];
+        sum += arr[i];
     }
     return sum;
 }
 
-void qsort(int *a, int from, int to){
-    if(from >= to) return;
-    int k = split(a, from, to);
+/**
+ * 計算考試五標 (頂前均後底)
+ */
+std_t examStd(int *arr, int n){
+    std_t std;
+    unsigned int p25, p50;
+
+    // 四捨五入
+    p25 = (unsigned int)round(n * 0.25);
+    p50 = (unsigned int)round(n * 0.50);
+
+    std.excellent = sumArr(arr, n-p25, n-1) / p25;
+    std.aboveAverage = sumArr(arr, n-p50, n-1) / p50;
+    std.average = sumArr(arr, 0, n-1) / n;
+    std.belowAverage = sumArr(arr, 0, p50-1) / p50;
+    std.poor = sumArr(arr, 0, p25-1) / p25;
     
-    qsort(a, from, k-1);
-    qsort(a, k+1, to);
+    // for(int i=0; i<3; i++){
+    //     if(i == 0){
+    //         p = n;
+    //         std[2] = sumArr(arr, 0, p-1) / p;
+    //     }
+    //     else{
+    //         p = (unsigned int)round(n * (1./(2*i)));
+    //         std[2-i] = sumArr(arr, 0, p-1) / p;
+    //         std[2+i] = sumArr(arr, n-p, n-1) / p;
+    //     }
+    // }
+    return std;
 }
 
-int split(int *a, int from, int to){
-    int pivot = a[from];
+void qsort(int *arr, int from, int to){
+    if(from >= to) return;
+    int k = split(arr, from, to);
+
+    qsort(arr, from, k-1);
+    qsort(arr, k+1, to);
+}
+
+int split(int *array, int from, int to){
+    int pivot = array[from];
     int temp;
     int left = from; int right = to;
     int k = from;
 
-    for(int i=1; i<=to-from; i++){
-        if(a[from+i] < pivot){
-            k++;
-            temp = a[from+i];
-            a[from+i] = a[k];
-            a[k] = temp;
+    /* 比 pivot 小的數字會依次排在 from+1, from+2, ...的位置, 直到比較到 to 時結束
+       此時位置 k 的左邊都是比 pivot 小的數字, 右邊都是比 pivot 大的數字
+       而且位置 k 的數比 pivot 小, 這時只要交換位置 k 與 pivot 的資料, 就可以達成
+       pivot 左邊都是比自己小的數, 右邊都是比自己大的數的目的了 (省記憶體)
+    */
+    for(int i=from+1; i<=to; i++){
+        if(array[i] < pivot){
+            k++;  // from+1, from+2, ...
+            temp = array[i];
+            array[i] = array[k];
+            array[k] = temp;
         }
     }
-    a[from] = a[k];
-    a[k] = pivot;
+    array[from] = array[k];
+    array[k] = pivot;
 
     return  k;
 }
 
-
-void msort(int *a, int from, int to){
+void msort(int *a, int n, int from, int to){
     if(from == to) return;
     int mid = (from + to)/2;
 
-    msort(a, from, mid);
-    msort(a, mid+1, to);
-    merge(a, from, mid, mid+1, to);
+    msort(a, n, from, mid);
+    msort(a, n, mid+1, to);
+    merge(a, n, from, mid, mid+1, to);
 }
 
-void merge(int *a, int f1, int t1, int f2, int t2){
+void merge(int *a, int n, int f1, int t1, int f2, int t2){
     int *b = new int[n];
     int p1 = f1;
     int p2 = f2;
@@ -170,6 +231,7 @@ void merge(int *a, int f1, int t1, int f2, int t2){
     while(p2 <= t2) b[idx++] = a[p2++];
 
     for(int i=f1; i <= t2; i++) a[i] = b[i];
+    delete [] b;
 }
 
 void bsort(int *a, int from, int to){
