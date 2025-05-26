@@ -7,7 +7,7 @@
 #include <stdlib.h>
 #include <math.h>
 
-#define DEBUG 0
+#define DEBUG 1
 // 可切換排序方法 ('q': quick sort, 'm': merge sort, 'b': bubble sort)
 #define METHOD 'q'
 
@@ -56,10 +56,8 @@ int main(){
     const char inputPath [] = "abc.txt";
     const char outputPath[] = "cba.txt";
     student_t *gradeSheet = NULL;
-    student_t a;
     int *gradeArr = NULL;  // 暫存成績
     unsigned int n;  // student 總數
-    unsigned int p;  // 區間人數
     std_t midtermStd, finalStd;
 
     // 開啟檔案
@@ -89,10 +87,10 @@ int main(){
 
     for(int i=0; i<n; i++){
         fscanf(finput, "%7s %d %d",
-               a.name,
-               &a.midterm,
-               &a.finalexam);
-        gradeSheet[i] = a;
+               gradeSheet[i].name,
+               &gradeSheet[i].midterm,
+               &gradeSheet[i].finalexam
+        );
     }
 
     // 先將期中考分數由低到高排序，並計算五標
