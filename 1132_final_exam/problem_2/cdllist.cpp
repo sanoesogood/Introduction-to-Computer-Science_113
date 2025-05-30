@@ -30,7 +30,7 @@
  * 9. 排版改了一下
  */
 
-#define DEBUG 1
+#define DEBUG 0
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -49,8 +49,8 @@ void create();
 void query();
 void insert();
 void delete_data();
-void show();
-void show_inverse();
+void show_descending();
+void show_ascending();
 
 #if DEBUG
 void show_memory();
@@ -94,11 +94,11 @@ int main(){
             break;
         case 5:	
             printf("========5: show by ascending order\n");
-            show();
+            show_ascending();
             break;
         case 6:
             printf("========6: show by descending order\n");
-            show_inverse();
+            show_descending();
             break;
         case 7: 
             printf("========7: quit\n");
@@ -252,7 +252,7 @@ void delete_data(){
 }
 
 // 按插入時間顯示 (最新插入的在最前面)
-void show(){
+void show_descending(){
     if(top == NULL){
         printf("no data in the list.\n");
         return;
@@ -269,7 +269,7 @@ void show(){
 }
 
 // 按插入時間顯示 (最早插入的在最前面)
-void show_inverse(){
+void show_ascending(){
     if(top == NULL){
         printf("no data in the list.\n");
         return;
