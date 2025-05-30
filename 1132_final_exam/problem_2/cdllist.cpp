@@ -1,7 +1,7 @@
 /**  
  * If Chinese text is not displayed, please go to (very important!): 
  * https://github.com/sanoesogood/Introduction-to-Computer-Science_113/tree/main/1132_final_exam/problem_2/cdllist.cpp
-
+ *
  * 在壓縮檔中，有我畫圖來解決雙向環狀鏈結串列的筆記 (不用畫的很難想出來)
  * 
  * 這是我用「老師給的程式」改的，在原程式的基礎上，我改動了: 
@@ -57,9 +57,9 @@ void show_memory();
 #endif
 
 int main(){
-      int choice = 0;
+    int choice = 0;
 
-      while(1){
+    while(1){
         printf("1: create list\n");
         printf("2: query\n");
         printf("3: insert\n");
